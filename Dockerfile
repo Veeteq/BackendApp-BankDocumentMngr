@@ -2,7 +2,7 @@
 FROM openjdk:11-slim as build
 
 #Declare user and group
-RUN addgroup -S spring && adduser -S spring -G spring
+RUN addgroup --system spring && adduser --system --group spring
 
 #Run the application as a non-root user.
 USER spring:spring
