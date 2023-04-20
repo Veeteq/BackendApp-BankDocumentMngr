@@ -64,6 +64,13 @@
       <version>2.0.28</version>
     </dependency>
     
+    <!-- JSOUP / Html -->
+    <dependency>
+        <groupId>org.jsoup</groupId>
+        <artifactId>jsoup</artifactId>
+        <version>1.15.4</version>
+    </dependency>
+    
     <!-- Test -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
