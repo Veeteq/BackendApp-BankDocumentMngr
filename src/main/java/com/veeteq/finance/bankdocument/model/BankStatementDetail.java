@@ -10,6 +10,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
@@ -25,14 +26,17 @@ import com.veeteq.finance.bankdocument.util.DateUtil;
 @AttributeOverride(name = "id", column = @Column(name = "deta_id"))
 @SequenceGenerator(name = "default_seq", sequenceName = "deta_seq", allocationSize = 1)
 public class BankStatementDetail extends BaseEntity<BankStatement> {
-
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @Column(name = "deta_id")
+    private Long id;
+    
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "stmt_id", referencedColumnName = "stmt_id", nullable = false)
     private BankStatement bankStatement;
     
-    @Column(name = "sequ_nm", columnDefinition = "tinyint") 
+    @Column(name = "sequ_nm")//, columnDefinition = "smallint") 
     private Integer sequenceNumber;
     
     @Column(name = "oper_dt")
@@ -71,14 +75,12 @@ public class BankStatementDetail extends BaseEntity<BankStatement> {
     @Column(name = "updt_dt", nullable = false, updatable = true)
     private LocalDateTime updateDateTime;
 
-    @Override
     public Long getId() {
-        return super.getId();
+        return this.id;
     }
     
-    @Override
     public BankStatementDetail setId(Long id) {
-        super.setId(id);
+        this.id = id;
         return this;
     }
     

@@ -2,35 +2,32 @@ package com.veeteq.finance.bankdocument.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.AttributeOverride;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import com.veeteq.finance.bankdocument.util.FileTypeConverter;
 
 @Entity
 @Table(name = "bank_statements")
-@AttributeOverride(name = "id", column = @Column(name = "stmt_id"))
-@SequenceGenerator(name = "default_seq", sequenceName = "stmt_seq", allocationSize = 1)
 public class BankStatement extends BaseEntity<BankStatement> {
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @Column(name = "stmt_id")
+    private Long id;
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "acco_id", referencedColumnName = "user_id")
     private Account account;
@@ -58,22 +55,12 @@ public class BankStatement extends BaseEntity<BankStatement> {
     @OneToMany(mappedBy = "bankStatement", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
     private List<BankStatementDetail> details = new ArrayList<>();
 
-    @CreationTimestamp
-    @Column(name = "crea_dt", nullable = false, updatable = false)
-    private LocalDateTime createDateTime;
-
-    @UpdateTimestamp
-    @Column(name = "updt_dt", nullable = false, updatable = true)
-    private LocalDateTime updateDateTime;
-
-    @Override
     public Long getId() {
-        return super.getId();
+        return this.id;
     }
     
-    @Override
     public BankStatement setId(Long id) {
-        super.setId(id);
+        this.id = id;
         return this;
     }
     
@@ -155,22 +142,4 @@ public class BankStatement extends BaseEntity<BankStatement> {
         return this;
     }
     
-    public LocalDateTime getCreateDateTime() {
-        return createDateTime;
-    }
-
-    public BankStatement setCreateDateTime(LocalDateTime createDateTime) {
-        this.createDateTime = createDateTime;
-        return this;
-    }
-
-    public LocalDateTime getUpdateDateTime() {
-        return updateDateTime;
-    }
-
-    public BankStatement setUpdateDateTime(LocalDateTime updateDateTime) {
-        this.updateDateTime = updateDateTime;
-        return this;
-    }
-
 }

@@ -1,27 +1,54 @@
 package com.veeteq.finance.bankdocument.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @MappedSuperclass
 public abstract class BaseEntity<E> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "default_seq")
-    private Long id;
+    @CreationTimestamp
+    @Column(name = "crea_dt", nullable = false, updatable = false)
+    private LocalDateTime createDateTime;
 
-    protected Long getId() {
-        return id;
+    @UpdateTimestamp
+    @Column(name = "updt_dt", nullable = false, updatable = true)
+    private LocalDateTime updateDateTime;
+    
+    @Column(name = "vers_nm")
+    private Integer version;
+    
+    protected LocalDateTime getCreateDateTime() {
+        return createDateTime;
     }
 
-    protected BaseEntity<E> setId(Long id) {
-        this.id = id;
+    protected BaseEntity<E> setCreateDateTime(LocalDateTime createDateTime) {
+        this.createDateTime = createDateTime;
         return this;
     }
 
+    protected LocalDateTime getUpdateDateTime() {
+        return updateDateTime;
+    }
+
+    protected BaseEntity<E> setUpdateDateTime(LocalDateTime updateDateTime) {
+        this.updateDateTime = updateDateTime;
+        return this;
+    }
+
+    protected Integer getVersion() {
+		return version;
+	}
+
+    protected BaseEntity<E> setVersion(Integer version) {
+		this.version = version;
+		return this;
+	}
+    
 }
