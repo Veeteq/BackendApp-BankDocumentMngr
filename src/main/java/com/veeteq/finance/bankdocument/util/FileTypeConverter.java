@@ -13,6 +13,9 @@ public class FileTypeConverter implements AttributeConverter<FileType, String> {
 
     @Override
     public FileType convertToEntityAttribute(String code) {
+    	if (code == null) {
+    		return FileType.UNDEFINED;
+    	}
         return FileType.findByCode(code);
     } 
 
