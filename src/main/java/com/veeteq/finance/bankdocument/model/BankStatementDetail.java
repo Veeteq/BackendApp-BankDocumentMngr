@@ -2,29 +2,21 @@ package com.veeteq.finance.bankdocument.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-import javax.persistence.AttributeOverride;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import com.veeteq.finance.bankdocument.util.DateUtil;
+import com.veeteq.finance.bankdocument.util.OperationTypeConverter;
 
 @Entity
 @Table(name = "bank_statement_details")
-@AttributeOverride(name = "id", column = @Column(name = "deta_id"))
-@SequenceGenerator(name = "default_seq", sequenceName = "deta_seq", allocationSize = 1)
 public class BankStatementDetail extends BaseEntity<BankStatement> {
     private static final long serialVersionUID = 1L;
 
@@ -36,7 +28,7 @@ public class BankStatementDetail extends BaseEntity<BankStatement> {
     @JoinColumn(name = "stmt_id", referencedColumnName = "stmt_id", nullable = false)
     private BankStatement bankStatement;
     
-    @Column(name = "sequ_nm")//, columnDefinition = "smallint") 
+    @Column(name = "sequ_nm") 
     private Integer sequenceNumber;
     
     @Column(name = "oper_dt")
@@ -46,7 +38,7 @@ public class BankStatementDetail extends BaseEntity<BankStatement> {
     private LocalDate postingDate;
 
     @Column(name = "oper_type_tx")
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = OperationTypeConverter.class)
     private OperationType operationType;
     
     @Column(name = "titl_tx")
@@ -67,14 +59,6 @@ public class BankStatementDetail extends BaseEntity<BankStatement> {
     @Column(name = "bala_am")
     private BigDecimal balance;
     
-    @CreationTimestamp
-    @Column(name = "crea_dt", nullable = false, updatable = false)
-    private LocalDateTime createDateTime;
-
-    @UpdateTimestamp
-    @Column(name = "updt_dt", nullable = false, updatable = true)
-    private LocalDateTime updateDateTime;
-
     public Long getId() {
         return this.id;
     }
@@ -191,14 +175,6 @@ public class BankStatementDetail extends BaseEntity<BankStatement> {
     public BankStatementDetail setBalance(BigDecimal balance) {
         this.balance = balance;
         return this;
-    }
-
-    public LocalDateTime getCreateDateTime() {
-        return createDateTime;
-    }
-
-    public LocalDateTime getUpdateDateTime() {
-        return updateDateTime;
     }
     
 }

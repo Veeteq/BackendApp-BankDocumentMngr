@@ -6,8 +6,9 @@ import org.springframework.http.MediaType;
 
 public enum FileType {
     APPLICATION_PDF("application/pdf", MediaType.APPLICATION_PDF),
-    TEXT_HTML("text/html",             MediaType.TEXT_HTML);
-    
+    TEXT_HTML("text/html",             MediaType.TEXT_HTML),
+    UNDEFINED("undefined",             null);
+	
     private final String code;
     private final MediaType mediaType;
     
