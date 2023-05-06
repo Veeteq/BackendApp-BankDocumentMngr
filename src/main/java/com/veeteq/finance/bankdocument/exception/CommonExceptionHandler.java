@@ -25,6 +25,14 @@ public class CommonExceptionHandler {
       return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> illegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+      LOG.warn(MessageFormat.format("IllegalArgumentException: occured {0} {1}" , ex.getMessage(), request.getDescription(false)));
+        
+      ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+      return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+    }
+    
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> globleExcpetionHandler(Exception ex, WebRequest request) {
       LOG.warn(MessageFormat.format("Generic exception occured: {0} {1}" , ex.getMessage(), request.getDescription(false)));
