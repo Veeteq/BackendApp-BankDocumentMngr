@@ -115,12 +115,8 @@ public class BankStatementController {
       BankStatementDTO parsed = bankStatementService.parseDocument(accountId, file);       
       
       LOG.info(MessageFormat.format("item with id {0} created", parsed.getId()));
-
-      URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-              .path("/{id}")
-              .buildAndExpand(parsed.getId())
-              .toUri();
-      return ResponseEntity.created(location).body(parsed);
+      
+      return ResponseEntity.ok().body(parsed);
     }    
     
     @DeleteMapping(path = "/{id}")
