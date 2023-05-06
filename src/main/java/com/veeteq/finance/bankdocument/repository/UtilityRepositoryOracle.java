@@ -11,15 +11,15 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@Profile(value = {"default", "dev"})
-public class UtilityRepositoryDefault implements UtilityRepository {
+@Profile(value = "prod")
+public class UtilityRepositoryOracle implements UtilityRepository {
     private final int bound = 5;
     
     @PersistenceContext
     private final EntityManager entityManager;
 
     @Autowired
-    public UtilityRepositoryDefault(EntityManager entityManager) {
+    public UtilityRepositoryOracle(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
     
