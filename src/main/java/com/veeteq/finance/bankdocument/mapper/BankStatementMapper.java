@@ -9,9 +9,17 @@ import com.veeteq.finance.bankdocument.model.BankStatement;
 import com.veeteq.finance.bankdocument.model.BankStatementDetail;
 import com.veeteq.finance.bankdocument.model.FileType;
 import com.veeteq.finance.bankdocument.model.OperationType;
+import com.veeteq.finance.bankdocument.repository.UtilityRepository;
 
 public class BankStatementMapper {
-private AccountMapper accountMapper = new AccountMapper();
+    private final AccountMapper accountMapper;
+    private final UtilityRepository utilityRepository;
+
+    
+    public BankStatementMapper(UtilityRepository utilityRepository) {
+        this.accountMapper = new AccountMapper();
+        this.utilityRepository = utilityRepository;
+    }
 
     public BankStatementDTO toDto(BankStatement entity) {
         if (entity == null) {
@@ -56,30 +64,30 @@ private AccountMapper accountMapper = new AccountMapper();
     
     public BankStatementSummaryDTO toSummaryDto(BankStatement entity) {
 
-    	BankStatementSummaryDTO dto = new BankStatementSummaryDTO()
-        .setId(entity.getId())
-        .setAccount(accountMapper.toDto(entity.getAccount()))
-        .setFileName(entity.getFileName())
-        .setReportDate(entity.getReportDate())
-        .setItemsCount(entity.getDetails().size())
-        .setTotalAmount(entity.getDetails().stream()
-                .map(BankStatementDetail::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add));
+        BankStatementSummaryDTO dto = new BankStatementSummaryDTO()
+                .setId(entity.getId() != null ? entity.getId() : utilityRepository.getBankStatementId())
+                .setAccount(accountMapper.toDto(entity.getAccount()))
+                .setFileName(entity.getFileName())
+                .setReportDate(entity.getReportDate())
+                .setItemsCount(entity.getDetails().size())
+                .setTotalAmount(entity.getDetails().stream()
+                        .map(BankStatementDetail::getAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add));
 
         return dto;
     }
 
     private BankStatementDetailDTO toDto(BankStatementDetail entity) {
-        BankStatementDetailDTO dto = new BankStatementDetailDTO();
-        dto.setId(entity.getId())
-        .setSequenceNumber(entity.getSequenceNumber())
-        .setOperationDate(entity.getOperationDate())
-        .setOperationType(entity.getOperationType().getCode())
-        .setPostingDate(entity.getPostingDate())
-        .setTitle(entity.getTitle())
-        .setAmount(entity.getAmount())
-        .setBalance(entity.getBalance());
-        
+        BankStatementDetailDTO dto = new BankStatementDetailDTO()
+                .setId(entity.getId() != null ? entity.getId() : utilityRepository.getBankStatementDetailId())
+                .setSequenceNumber(entity.getSequenceNumber())
+                .setOperationDate(entity.getOperationDate())
+                .setOperationType(entity.getOperationType().getCode())
+                .setPostingDate(entity.getPostingDate())
+                .setTitle(entity.getTitle())
+                .setAmount(entity.getAmount())
+                .setBalance(entity.getBalance());
+
         return dto;
     }
 

@@ -28,6 +28,7 @@ import com.veeteq.finance.bankdocument.model.Account;
 import com.veeteq.finance.bankdocument.model.BankStatement;
 import com.veeteq.finance.bankdocument.repository.AccountRepository;
 import com.veeteq.finance.bankdocument.repository.BankStatementRepository;
+import com.veeteq.finance.bankdocument.repository.UtilityRepository;
 
 @Service
 public class BankStatementService {
@@ -35,14 +36,16 @@ public class BankStatementService {
     
     private final AccountRepository accountRepository;
     private final BankStatementRepository bankStatementRepository;
-    
     private final AccountMapper accountMapper = new AccountMapper();
-    private final BankStatementMapper mapper = new BankStatementMapper();
+    private final BankStatementMapper mapper;
     
     @Autowired
-    public BankStatementService(AccountRepository accountRepository, BankStatementRepository bankStatementRepository) {
+    public BankStatementService(AccountRepository accountRepository, 
+                                BankStatementRepository bankStatementRepository,
+                                UtilityRepository utilityRepository) {
         this.accountRepository = accountRepository;
         this.bankStatementRepository = bankStatementRepository;
+        this.mapper = new BankStatementMapper(utilityRepository);
     }
 
     @Transactional
