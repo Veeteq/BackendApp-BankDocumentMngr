@@ -36,8 +36,6 @@ public class BankStatementService {
     
     private final AccountRepository accountRepository;
     private final BankStatementRepository bankStatementRepository;
-    private final UtilityRepository utilityRepository;
-    
     private final AccountMapper accountMapper = new AccountMapper();
     private final BankStatementMapper mapper;
     
@@ -47,7 +45,6 @@ public class BankStatementService {
                                 UtilityRepository utilityRepository) {
         this.accountRepository = accountRepository;
         this.bankStatementRepository = bankStatementRepository;
-        this.utilityRepository = utilityRepository;
         this.mapper = new BankStatementMapper(utilityRepository);
     }
 
