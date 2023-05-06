@@ -40,6 +40,16 @@ public class UtilityRepositoryDefault implements UtilityRepository {
     
     @Override
     public Long getBankStatementDetailId() {
-        return 1l;
+        Random rnd = new Random();
+        long nextLong = 0;
+        long count = 0;
+        
+        TypedQuery<Long> query = entityManager.createQuery("SELECT Count(bd) FROM BankStatementDetail bd WHERE bd.id = :id", Long.class);               
+        do {
+            nextLong = rnd.nextInt(bound);
+            count = query.setParameter("id", nextLong).getSingleResult();            
+        } while(count > 0);
+        
+        return nextLong;
     }
 }
