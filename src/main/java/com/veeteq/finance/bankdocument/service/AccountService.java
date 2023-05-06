@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 import com.veeteq.finance.bankdocument.dto.AccountDTO;
@@ -24,7 +26,8 @@ public class AccountService {
 
     public List<AccountDTO> getAll() {
         
-        List<AccountDTO> list = accountRepository.findAll()
+    	Sort defaultSort = Sort.by(Order.asc("id"));
+        List<AccountDTO> list = accountRepository.findAll(defaultSort)
         .stream()
         .map(mapper::toDto)
         .collect(Collectors.toList());
