@@ -5,15 +5,15 @@ import java.time.LocalDate;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.veeteq.finance.bankdocument.util.DateUtil;
-import com.veeteq.finance.bankdocument.util.OperationTypeConverter;
 
 @Entity
 @Table(name = "bank_statement_details")
@@ -38,7 +38,7 @@ public class BankStatementDetail extends BaseEntity<BankStatement> {
     private LocalDate postingDate;
 
     @Column(name = "oper_type_tx")
-    @Convert(converter = OperationTypeConverter.class)
+    @Enumerated(value = EnumType.STRING)
     private OperationType operationType;
     
     @Column(name = "titl_tx")
