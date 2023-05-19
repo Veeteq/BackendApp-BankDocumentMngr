@@ -69,8 +69,8 @@ public class MBankProcessor implements UploadProcessor {
             .setPostingDate(postingDate)
             .setOperationType(OperationType.findByCode(operationDetails.getOperationType()).name())
             .setTitle(operationDetails.getTitle())
-            .setAccountNumber(operationDetails.getAccountNumber())
-            .setCounterparty(operationDetails.getCounterparty())
+            .setCounterpartyIban(operationDetails.getAccountNumber())
+            .setCounterpartyName(operationDetails.getCounterparty())
             .setCounterpartyAddress(operationDetails.getCounterpartyAddress())
             .setAmount(operationAmount)
             .setBalance(balance);

@@ -11,8 +11,9 @@ public class BankStatementDetailDTO {
     private String operationType;
     private LocalDate postingDate;
     private String title;
-    private String accountNumber;
-    private String counterparty;
+    private Long counterpartyId;
+    private String counterpartyName;
+    private String counterpartyIban;
     private String counterpartyAddress;
     private BigDecimal amount;
     private BigDecimal balance;
@@ -71,21 +72,30 @@ public class BankStatementDetailDTO {
         return this;
     }
 
-    public String getAccountNumber() {
-        return accountNumber;
+    public Long getCounterpartyId() {
+        return counterpartyId;
     }
 
-    public BankStatementDetailDTO setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
+    public BankStatementDetailDTO setCounterpartyId(Long counterpartyId) {
+        this.counterpartyId = counterpartyId;
         return this;
     }
 
-    public String getCounterparty() {
-        return counterparty;
+    public String getCounterpartyName() {
+        return counterpartyName;
     }
 
-    public BankStatementDetailDTO setCounterparty(String counterparty) {
-        this.counterparty = counterparty;
+    public BankStatementDetailDTO setCounterpartyName(String counterpartyName) {
+        this.counterpartyName = counterpartyName;
+        return this;
+    }
+
+    public String getCounterpartyIban() {
+        return counterpartyIban;
+    }
+
+    public BankStatementDetailDTO setCounterpartyIban(String counterpartyIban) {
+        this.counterpartyIban = counterpartyIban;
         return this;
     }
 
