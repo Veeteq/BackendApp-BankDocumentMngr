@@ -41,17 +41,20 @@ public class BankStatementDetail extends BaseEntity<BankStatement> {
     @Enumerated(value = EnumType.STRING)
     private OperationType operationType;
     
-    @Column(name = "titl_tx")
+    @Column(name = "oper_titl_tx")
     private String title;
     
-    @Column(name = "cprt_tx")
-    private String counterparty;
+    @Column(name = "cprt_name_tx")
+    private String counterpartyName;
     
     @Column(name = "cprt_addr_tx")
     private String counterpartyAddress;
     
-    @Column(name = "acco_numb_tx")
-    private String accountNumber;
+    @Column(name = "cprt_id")
+    private Long counterpartyId;
+    
+    @Column(name = "cprt_iban_tx")
+    private String counterpartyIban;
     
     @Column(name = "oper_am")
     private BigDecimal amount;
@@ -132,8 +135,13 @@ public class BankStatementDetail extends BaseEntity<BankStatement> {
         return this;
     }
 
-    public String getCounterparty() {
-        return counterparty;
+    public String getCounterpartyName() {
+        return counterpartyName;
+    }
+
+    public BankStatementDetail setCounterpartyName(String counterpartyName) {
+        this.counterpartyName = counterpartyName;
+        return this;
     }
 
     public String getCounterpartyAddress() {
@@ -145,17 +153,21 @@ public class BankStatementDetail extends BaseEntity<BankStatement> {
         return this;
     }
 
-    public BankStatementDetail setCounterparty(String counterparty) {
-        this.counterparty = counterparty;
+    public Long getCounterpartyId() {
+        return counterpartyId;
+    }
+
+    public BankStatementDetail setCounterpartyId(Long counterpartyId) {
+        this.counterpartyId = counterpartyId;
         return this;
     }
 
-    public String getAccountNumber() {
-        return accountNumber;
+    public String getCounterpartyIban() {
+        return counterpartyIban;
     }
 
-    public BankStatementDetail setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
+    public BankStatementDetail setCounterpartyIban(String counterpartyIban) {
+        this.counterpartyIban = counterpartyIban;
         return this;
     }
 

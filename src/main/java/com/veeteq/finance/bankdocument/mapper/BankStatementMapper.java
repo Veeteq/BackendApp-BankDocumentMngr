@@ -101,9 +101,10 @@ public class BankStatementMapper {
         .setTitle(dto.getTitle())
         .setAmount(dto.getAmount())
         .setBalance(dto.getBalance())
-        .setAccountNumber(dto.getAccountNumber())
-        .setCounterparty(dto.getCounterparty())
-        .setCounterpartyAddress(dto.getCounterpartyAddress());
+        .setCounterpartyId(dto.getCounterpartyId())
+        .setCounterpartyName(dto.getCounterpartyName())
+        .setCounterpartyAddress(dto.getCounterpartyAddress())
+        .setCounterpartyIban(dto.getCounterpartyIban());
         
         return entity;
     }
