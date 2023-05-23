@@ -30,7 +30,6 @@ import com.veeteq.finance.bankdocument.dto.BankStatementDTO;
 import com.veeteq.finance.bankdocument.dto.BankStatementSummaryDTO;
 import com.veeteq.finance.bankdocument.dto.PageResponse;
 import com.veeteq.finance.bankdocument.exception.ResourceNotFoundException;
-import com.veeteq.finance.bankdocument.integration.counterparty.CounterpartyMngrClient;
 import com.veeteq.finance.bankdocument.service.BankStatementService;
 
 @RestController
@@ -40,15 +39,13 @@ public class BankStatementController {
     private final Logger LOG = LoggerFactory.getLogger(BankStatementController.class);
 
     private final BankStatementService bankStatementService;
-    private final CounterpartyMngrClient counterpartyClient;
+
     private final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule());
     
     @Autowired
-    public BankStatementController(BankStatementService bankStatementService,
-                                   CounterpartyMngrClient counterpartyMngrClient) {
-        this.bankStatementService = bankStatementService;
-        this.counterpartyClient = counterpartyMngrClient;
+    public BankStatementController(BankStatementService bankStatementService) {
+        this.bankStatementService = bankStatementService;        
     }
     
     @GetMapping(path = "/{id}")
@@ -56,8 +53,6 @@ public class BankStatementController {
         LOG.info("Processing get request and retrieving single statment with id: " + id);
         
         BankStatementDTO bankStatement = bankStatementService.findById(id);
-        Long counterpartyId = counterpartyClient.searchByBankData(bankStatement.getDetails().get(0));
-        System.out.println("counterpartyId: " + counterpartyId);
         
         return ResponseEntity.ok(bankStatement);
     }

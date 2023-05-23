@@ -11,6 +11,6 @@ import com.veeteq.finance.bankdocument.dto.BankStatementDetailDTO;
 public interface CounterpartyMngrClient {
     
     @PostMapping(path = "/api/counterparties/searchByBankData", consumes = MediaType.APPLICATION_JSON_VALUE)
-    Long searchByBankData(@RequestBody BankStatementDetailDTO bankStatementDetailDTO);
+    Long searchByBankData(@RequestBody BankStatementDetailDTO bankStatementDetail);
 
 }
