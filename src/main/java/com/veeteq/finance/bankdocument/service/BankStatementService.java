@@ -22,6 +22,7 @@ import com.veeteq.finance.bankdocument.dto.PageResponse;
 import com.veeteq.finance.bankdocument.exception.ResourceNotFoundException;
 import com.veeteq.finance.bankdocument.fileupload.UploadProcessor;
 import com.veeteq.finance.bankdocument.fileupload.UploadProcessorFactory;
+import com.veeteq.finance.bankdocument.jms.MessageQueueService;
 import com.veeteq.finance.bankdocument.mapper.AccountMapper;
 import com.veeteq.finance.bankdocument.mapper.BankStatementMapper;
 import com.veeteq.finance.bankdocument.model.Account;
@@ -36,16 +37,21 @@ public class BankStatementService {
     
     private final AccountRepository accountRepository;
     private final BankStatementRepository bankStatementRepository;
-    private final AccountMapper accountMapper = new AccountMapper();
+    private final AccountMapper accountMapper;
     private final BankStatementMapper mapper;
+    private final MessageQueueService messageQueueService;
     
     @Autowired
     public BankStatementService(AccountRepository accountRepository, 
                                 BankStatementRepository bankStatementRepository,
+                                MessageQueueService messageQueueService,
                                 UtilityRepository utilityRepository) {
         this.accountRepository = accountRepository;
         this.bankStatementRepository = bankStatementRepository;
+        this.messageQueueService = messageQueueService;
+
         this.mapper = new BankStatementMapper(utilityRepository);
+        this.accountMapper = new AccountMapper();
     }
 
     @Transactional
@@ -60,7 +66,15 @@ public class BankStatementService {
         
         BankStatement savedBankStatement = bankStatementRepository.save(bankStatement);
         
-        return mapper.toDto(savedBankStatement);
+        BankStatementDTO response = mapper.toDto(savedBankStatement);
+
+        /**
+         * Register all bank statement details to message queue
+         * before sending the response back to the caller
+         */
+        messageQueueService.registerBankStatement(response);
+
+        return response;
     }
     
     public BankStatementDTO parseDocument(Long accountId, MultipartFile document) {
@@ -78,7 +92,6 @@ public class BankStatementService {
             e.printStackTrace();
         }
 
-        
         bankStatement
         .setAccount(accountMapper.toDto(accountRef))
         .setSize(document.getSize())
@@ -94,9 +107,15 @@ public class BankStatementService {
         BankStatement savedBankStatement = bankStatementRepository
         .findByIdWithDetails(id)
         .orElseThrow(() -> new ResourceNotFoundException("Bank Statement not found for this id :: " + id));
-        
+
         BankStatementDTO response = mapper.toDto(savedBankStatement);
         
+        /**
+         * Register all bank statement details to message queue
+         * before sending the response back to the caller
+         */        
+        messageQueueService.registerBankStatement(response);
+
         return response;
     }
         
