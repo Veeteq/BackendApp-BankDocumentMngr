@@ -1,5 +1,7 @@
 package com.veeteq.finance.bankdocument.jms;
 
+import javax.jms.Session;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
@@ -22,7 +24,11 @@ public class JmsConfiguration {
     @Bean
     public JmsListenerContainerFactory<?> queueListenerFactory() {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+
+        factory.setSessionAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);
+        factory.setErrorHandler(t -> System.out.println("An exception occured " + t.getMessage()));
         factory.setMessageConverter(messageConverter());
+
         return factory;
     }
 

@@ -57,6 +57,16 @@ public class BankStatementController {
         return ResponseEntity.ok(bankStatement);
     }
     
+    @GetMapping(path = "/{id}/counterparty")
+    public ResponseEntity<?> searchForCounterparties(@PathVariable("id") Long id) throws ResourceNotFoundException {
+        LOG.info("Processing request to find couterparties for statment with id: " + id);
+        
+        BankStatementDTO bankStatement = bankStatementService.findById(id);
+        bankStatementService.searchForCounterparty(bankStatement);
+        
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping(path = "/{id}/file")
     public ResponseEntity<ByteArrayResource> findFileById(@PathVariable(name = "id", required = true) Long id) {
         LOG.info("Processing get request and retrieving file attachement for statment with id: " + id);
