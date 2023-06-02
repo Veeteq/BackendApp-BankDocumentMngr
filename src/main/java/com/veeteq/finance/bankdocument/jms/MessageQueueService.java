@@ -20,11 +20,22 @@ public class MessageQueueService {
 
     public void registerBankStatement(BankStatementDTO bankStatement) {        
         System.out.println("the total amount of details is: " + bankStatement.getDetails().size());
-        bankStatement.getDetails().stream().forEach(detail -> {
+        bankStatement.getDetails().stream()
+                .filter(detail -> detail.getCounterpartyId() == null)
+                //.filter(detail -> detail.getCounterpartyIban() != null)
+                .forEach(detail -> {
             System.out.println("registering bank statement detail: " + detail.getTitle());
-            jmsTemplate.convertAndSend(COUNTERPARTY_QUEUE, detail);
+
+            //jmsTemplate.send(COUNTERPARTY_QUEUE, session -> {
+            //    BytesMessage message = session.createBytesMessage();
+            //    message.writeBytes(detail);
+            //    return message;
+            //});
+
+            jmsTemplate.convertAndSend(COUNTERPARTY_QUEUE, detail, message -> {
+                return message;
+            });
         });
-        
     }
 
 }

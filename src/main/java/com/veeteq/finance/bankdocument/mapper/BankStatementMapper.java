@@ -86,7 +86,11 @@ public class BankStatementMapper {
                 .setPostingDate(entity.getPostingDate())
                 .setTitle(entity.getTitle())
                 .setAmount(entity.getAmount())
-                .setBalance(entity.getBalance());
+                .setBalance(entity.getBalance())
+                .setCounterpartyId(entity.getCounterpartyId())
+                .setCounterpartyName(entity.getCounterpartyName())
+                .setCounterpartyAddress(entity.getCounterpartyAddress())
+                .setCounterpartyIban(entity.getCounterpartyIban());
 
         return dto;
     }

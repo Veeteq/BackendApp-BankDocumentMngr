@@ -109,12 +109,6 @@ public class BankStatementService {
         .orElseThrow(() -> new ResourceNotFoundException("Bank Statement not found for this id :: " + id));
 
         BankStatementDTO response = mapper.toDto(savedBankStatement);
-        
-        /**
-         * Register all bank statement details to message queue
-         * before sending the response back to the caller
-         */        
-        messageQueueService.registerBankStatement(response);
 
         return response;
     }
@@ -162,6 +156,13 @@ public class BankStatementService {
                 .contentLength(resource.contentLength())
                 .contentType(savedBankStatement.getFileType().getMediaType())
                 .body(resource);              
+    }
+
+    public void searchForCounterparty(BankStatementDTO bankStatement) {
+        /**
+         * Register all bank statement details to message queue
+         */        
+        messageQueueService.registerBankStatement(bankStatement);        
     }
 
     private byte[] toByteArray(Byte[] objBytes) {

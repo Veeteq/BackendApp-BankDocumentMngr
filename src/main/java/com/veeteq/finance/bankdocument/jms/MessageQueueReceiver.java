@@ -17,18 +17,20 @@ import org.springframework.stereotype.Component;
 
 import com.veeteq.finance.bankdocument.dto.BankStatementDetailDTO;
 import com.veeteq.finance.bankdocument.integration.counterparty.CounterpartyMngrClient;
+import com.veeteq.finance.bankdocument.service.BankStatementDetailService;
 
 @Component
 public class MessageQueueReceiver {
     private final static Logger LOG = LoggerFactory.getLogger(MessageQueueReceiver.class);
 
     private final CounterpartyMngrClient counterpartyClient;
-    
-    @Autowired
-    public MessageQueueReceiver(CounterpartyMngrClient counterpartyClient) {
-        this.counterpartyClient = counterpartyClient;
-    }
+    private final BankStatementDetailService bankStatementDetailService;
 
+    @Autowired
+    public MessageQueueReceiver(CounterpartyMngrClient counterpartyClient, BankStatementDetailService bankStatementDetailService) {
+        this.counterpartyClient = counterpartyClient;
+        this.bankStatementDetailService = bankStatementDetailService;
+    }
 
     @JmsListener(destination = COUNTERPARTY_QUEUE)
     public void receiveMessage(@Payload BankStatementDetailDTO detail, @Headers MessageHeaders headers, Message<BankStatementDetailDTO> message, Session session) {
@@ -42,7 +44,12 @@ public class MessageQueueReceiver {
         LOG.info("- - - - - - - - - - - - - - - - - - - - - - - -");
         
         Long counterpartyId = counterpartyClient.searchByBankData(detail);
-        System.out.println("counterpartyId: " + counterpartyId);
+        if (counterpartyId > 0) {
+            LOG.info("updating counterparty for record: " + detail.getId() + " with value: " + counterpartyId);
+            int cnt = bankStatementDetailService.setCounterpartyId(counterpartyId, detail.getId());
+            LOG.info(cnt + " record[s] updated");
+            LOG.info("- - - - - - - - - - - - - - - - - - - - - - - -");
+        }
     }
     
 }
