@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.veeteq.finance.bankdocument.dto.BankDataDTO;
 import com.veeteq.finance.bankdocument.dto.BankStatementDTO;
 import com.veeteq.finance.bankdocument.dto.BankStatementSummaryDTO;
 import com.veeteq.finance.bankdocument.dto.PageResponse;
@@ -72,7 +73,7 @@ public class BankStatementService {
          * Register all bank statement details to message queue
          * before sending the response back to the caller
          */
-        messageQueueService.registerBankStatement(response);
+        //messageQueueService.registerBankStatement(response);
 
         return response;
     }
@@ -112,7 +113,22 @@ public class BankStatementService {
 
         return response;
     }
-        
+
+    public List<BankDataDTO> getBankDataById(Long id) {
+        LOG.info("Retrieving bank statement with id: " + id);
+
+        BankStatement savedBankStatement = bankStatementRepository
+                .findByIdWithDetails(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Bank Statement not found for this id :: " + id));
+
+        List<BankDataDTO> response = savedBankStatement.getDetails().stream()
+                .filter(detail -> detail.getCounterpartyId() == null)
+                .map(mapper::toBankData)
+                .collect(Collectors.toList());
+
+        return response;
+    }
+
     public PageResponse<BankStatementSummaryDTO> findAll(PageRequest pageRequest) {
         LOG.info("getSummary: page=" + pageRequest.getPageNumber() + ", size=" + pageRequest.getPageSize() + ", sort=[" + pageRequest.getSort().toString() + ']');
         
@@ -158,11 +174,11 @@ public class BankStatementService {
                 .body(resource);              
     }
 
-    public void searchForCounterparty(BankStatementDTO bankStatement) {
+    public void searchForCounterparty(List<BankDataDTO> bankData) {
         /**
          * Register all bank statement details to message queue
          */        
-        messageQueueService.registerBankStatement(bankStatement);        
+        messageQueueService.registerBankStatement(bankData);        
     }
 
     private byte[] toByteArray(Byte[] objBytes) {
