@@ -2,6 +2,7 @@ package com.veeteq.finance.bankdocument.mapper;
 
 import java.math.BigDecimal;
 
+import com.veeteq.finance.bankdocument.dto.BankDataDTO;
 import com.veeteq.finance.bankdocument.dto.BankStatementDTO;
 import com.veeteq.finance.bankdocument.dto.BankStatementDetailDTO;
 import com.veeteq.finance.bankdocument.dto.BankStatementSummaryDTO;
@@ -111,5 +112,19 @@ public class BankStatementMapper {
         .setCounterpartyIban(dto.getCounterpartyIban());
         
         return entity;
+    }
+
+    public BankDataDTO toBankData(BankStatementDetail entity) {
+      if (entity == null) {
+        return null;
+      }
+
+      BankDataDTO bankData = new BankDataDTO()
+                .setId(entity.getId())
+                .setAccountNumber(entity.getCounterpartyIban())
+                .setCounterparty(entity.getCounterpartyName())
+                .setCounterpartyAddress(entity.getCounterpartyAddress())
+                .setTitle(entity.getTitle());
+      return bankData;
     }
 }

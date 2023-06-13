@@ -2,6 +2,7 @@ package com.veeteq.finance.bankdocument.controller;
 
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.veeteq.finance.bankdocument.dto.BankDataDTO;
 import com.veeteq.finance.bankdocument.dto.BankStatementDTO;
 import com.veeteq.finance.bankdocument.dto.BankStatementSummaryDTO;
 import com.veeteq.finance.bankdocument.dto.PageResponse;
@@ -61,8 +63,8 @@ public class BankStatementController {
     public ResponseEntity<?> searchForCounterparties(@PathVariable("id") Long id) throws ResourceNotFoundException {
         LOG.info("Processing request to find couterparties for statment with id: " + id);
         
-        BankStatementDTO bankStatement = bankStatementService.findById(id);
-        bankStatementService.searchForCounterparty(bankStatement);
+        List<BankDataDTO> bankData = bankStatementService.getBankDataById(id);
+        bankStatementService.searchForCounterparty(bankData);
         
         return ResponseEntity.ok().build();
     }
