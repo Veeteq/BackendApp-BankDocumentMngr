@@ -1,7 +1,14 @@
 package com.veeteq.finance.bankdocument.jms;
 
-import com.veeteq.finance.bankdocument.integration.counterparty.CounterpartyMngrClient;
-import com.veeteq.finance.bankdocument.service.BankStatementDetailService;
+import static com.veeteq.finance.bankdocument.jms.JmsConfiguration.COUNTERPARTY_RESPONSE_QUEUE;
+
+import java.util.Map;
+
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
+import javax.jms.Message;
+import javax.jms.Session;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,24 +18,16 @@ import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import javax.jms.JMSException;
-import javax.jms.MapMessage;
-import javax.jms.Message;
-import javax.jms.Session;
-import java.util.Map;
-
-import static com.veeteq.finance.bankdocument.jms.JmsConfiguration.COUNTERPARTY_RESPONSE_QUEUE;
+import com.veeteq.finance.bankdocument.service.BankStatementDetailService;
 
 @Component
 public class MessageQueueListener {
     private final static Logger LOG = LoggerFactory.getLogger(MessageQueueListener.class);
 
-    private final CounterpartyMngrClient counterpartyClient;
     private final BankStatementDetailService bankStatementDetailService;
 
     @Autowired
-    public MessageQueueListener(CounterpartyMngrClient counterpartyClient, BankStatementDetailService bankStatementDetailService) {
-        this.counterpartyClient = counterpartyClient;
+    public MessageQueueListener(BankStatementDetailService bankStatementDetailService) {
         this.bankStatementDetailService = bankStatementDetailService;
     }
 
