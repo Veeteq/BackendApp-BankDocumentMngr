@@ -177,7 +177,7 @@ public class BankStatementService {
     public void searchForCounterparty(List<BankDataDTO> bankData) {
         /**
          * Register all bank statement details to message queue
-         */        
+         */
         messageQueueService.registerBankStatement(bankData);        
     }
 
