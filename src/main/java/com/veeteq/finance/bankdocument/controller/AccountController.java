@@ -33,10 +33,10 @@ public class AccountController {
     public ResponseEntity<List<AccountDTO>> getAccountsForDocument() {
         LOG.info("Retrieving accounts eligible for bank statement");
 
-        List<AccountDTO> savedAccounts = accountService.getAll();
+        List<AccountDTO> accounts = accountService.getAll();
         
         return ResponseEntity
                 .ok()
-                .body(savedAccounts);
+                .body(accounts);
     }
 }

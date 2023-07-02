@@ -9,11 +9,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -28,9 +25,8 @@ public class BankStatement extends BaseEntity<BankStatement> {
     @Column(name = "stmt_id")
     private Long id;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "acco_id", referencedColumnName = "user_id")
-    private Account account;
+    @Column(name = "acco_id", nullable = true)
+    private Long accountId;
 
     @Column(name = "file_name_tx")
     private String fileName;
@@ -64,12 +60,12 @@ public class BankStatement extends BaseEntity<BankStatement> {
         return this;
     }
     
-    public Account getAccount() {
-        return account;
+    public Long getAccountId() {
+        return accountId;
     }
 
-    public BankStatement setAccount(Account account) {
-        this.account = account;
+    public BankStatement setAccountId(Long accountId) {
+        this.accountId = accountId;
         return this;
     }
 

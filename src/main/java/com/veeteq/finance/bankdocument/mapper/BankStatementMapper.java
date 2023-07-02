@@ -2,23 +2,20 @@ package com.veeteq.finance.bankdocument.mapper;
 
 import java.math.BigDecimal;
 
-import com.veeteq.finance.bankdocument.dto.BankDataDTO;
-import com.veeteq.finance.bankdocument.dto.BankStatementDTO;
-import com.veeteq.finance.bankdocument.dto.BankStatementDetailDTO;
-import com.veeteq.finance.bankdocument.dto.BankStatementSummaryDTO;
+import com.veeteq.finance.bankdocument.dto.*;
 import com.veeteq.finance.bankdocument.model.BankStatement;
 import com.veeteq.finance.bankdocument.model.BankStatementDetail;
 import com.veeteq.finance.bankdocument.model.FileType;
 import com.veeteq.finance.bankdocument.model.OperationType;
 import com.veeteq.finance.bankdocument.repository.UtilityRepository;
+import com.veeteq.finance.bankdocument.service.AccountService;
 
 public class BankStatementMapper {
-    private final AccountMapper accountMapper;
+    private final AccountService accountService;
     private final UtilityRepository utilityRepository;
 
-    
-    public BankStatementMapper(UtilityRepository utilityRepository) {
-        this.accountMapper = new AccountMapper();
+    public BankStatementMapper(AccountService accountService, UtilityRepository utilityRepository) {
+        this.accountService = accountService;
         this.utilityRepository = utilityRepository;
     }
 
@@ -26,10 +23,10 @@ public class BankStatementMapper {
         if (entity == null) {
             return null;
         }
-        
+        AccountDTO account = accountService.getById(entity.getAccountId());
         BankStatementDTO dto = new BankStatementDTO()
                 .setId(entity.getId())
-                .setAccount(accountMapper.toDto(entity.getAccount()))
+                .setAccount(account)
                 .setSize(entity.getAttachment().length)
                 .setFileName(entity.getFileName())
                 .setContentType(entity.getFileType().getCode())
@@ -65,9 +62,10 @@ public class BankStatementMapper {
     
     public BankStatementSummaryDTO toSummaryDto(BankStatement entity) {
 
+        AccountDTO account = accountService.getById(entity.getAccountId());
         BankStatementSummaryDTO dto = new BankStatementSummaryDTO()
                 .setId(entity.getId() != null ? entity.getId() : utilityRepository.getBankStatementId())
-                .setAccount(accountMapper.toDto(entity.getAccount()))
+                .setAccount(account)
                 .setFileName(entity.getFileName())
                 .setReportDate(entity.getReportDate())
                 .setItemsCount(entity.getDetails().size())
