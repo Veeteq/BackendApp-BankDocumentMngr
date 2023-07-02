@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import com.veeteq.finance.bankdocument.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,53 +17,44 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.veeteq.finance.bankdocument.dto.BankDataDTO;
-import com.veeteq.finance.bankdocument.dto.BankStatementDTO;
-import com.veeteq.finance.bankdocument.dto.BankStatementSummaryDTO;
-import com.veeteq.finance.bankdocument.dto.PageResponse;
 import com.veeteq.finance.bankdocument.exception.ResourceNotFoundException;
 import com.veeteq.finance.bankdocument.fileupload.UploadProcessor;
 import com.veeteq.finance.bankdocument.fileupload.UploadProcessorFactory;
 import com.veeteq.finance.bankdocument.jms.MessageQueueService;
-import com.veeteq.finance.bankdocument.mapper.AccountMapper;
 import com.veeteq.finance.bankdocument.mapper.BankStatementMapper;
-import com.veeteq.finance.bankdocument.model.Account;
 import com.veeteq.finance.bankdocument.model.BankStatement;
-import com.veeteq.finance.bankdocument.repository.AccountRepository;
 import com.veeteq.finance.bankdocument.repository.BankStatementRepository;
 import com.veeteq.finance.bankdocument.repository.UtilityRepository;
 
 @Service
 public class BankStatementService {
     private final Logger LOG = LoggerFactory.getLogger(BankStatementService.class);
-    
-    private final AccountRepository accountRepository;
+
     private final BankStatementRepository bankStatementRepository;
-    private final AccountMapper accountMapper;
+    private final AccountService accountService;
     private final BankStatementMapper mapper;
     private final MessageQueueService messageQueueService;
     
     @Autowired
-    public BankStatementService(AccountRepository accountRepository, 
-                                BankStatementRepository bankStatementRepository,
+    public BankStatementService(BankStatementRepository bankStatementRepository,
+                                AccountService accountService,
                                 MessageQueueService messageQueueService,
                                 UtilityRepository utilityRepository) {
-        this.accountRepository = accountRepository;
+        this.accountService = accountService;
         this.bankStatementRepository = bankStatementRepository;
         this.messageQueueService = messageQueueService;
 
-        this.mapper = new BankStatementMapper(utilityRepository);
-        this.accountMapper = new AccountMapper();
+        this.mapper = new BankStatementMapper(accountService, utilityRepository);
     }
 
     @Transactional
     public BankStatementDTO saveDocument(BankStatementDTO bankStatementDto, MultipartFile file) {
         LOG.info("saveBankStatement");
         
-        Account accountRef = accountRepository.getReferenceById(bankStatementDto.getAccount().getId());
+        AccountDTO account = accountService.getById(bankStatementDto.getAccount().getId());
         
         BankStatement bankStatement = mapper.toEntity(bankStatementDto);
-        bankStatement.setAccount(accountRef);
+        bankStatement.setAccountId(account.getId());
         bankStatement.setAttachment(fileToBytes(file));
         
         BankStatement savedBankStatement = bankStatementRepository.save(bankStatement);
@@ -79,9 +71,7 @@ public class BankStatementService {
     }
     
     public BankStatementDTO parseDocument(Long accountId, MultipartFile document) {
-        Account accountRef = accountRepository
-                .findById(accountId)
-                .orElseThrow(() -> new ResourceNotFoundException("Account not found for this id :: " + accountId));
+        AccountDTO account = accountService.getById(accountId);
         
         UploadProcessor processor = UploadProcessorFactory.getUploadProcessor(document.getContentType());
 
@@ -94,7 +84,7 @@ public class BankStatementService {
         }
 
         bankStatement
-        .setAccount(accountMapper.toDto(accountRef))
+        .setAccount(account)
         .setSize(document.getSize())
         .setContentType(document.getContentType())
         .setFileName(document.getOriginalFilename());
@@ -132,7 +122,7 @@ public class BankStatementService {
     public PageResponse<BankStatementSummaryDTO> findAll(PageRequest pageRequest) {
         LOG.info("getSummary: page=" + pageRequest.getPageNumber() + ", size=" + pageRequest.getPageSize() + ", sort=[" + pageRequest.getSort().toString() + ']');
         
-        Page<BankStatement> page = bankStatementRepository.findAllWithAccountAndDetails(pageRequest);
+        Page<BankStatement> page = bankStatementRepository.findAllWithDetails(pageRequest);
         List<BankStatementSummaryDTO> content = page.getContent()
                 .stream()
                 .map(mapper::toSummaryDto)

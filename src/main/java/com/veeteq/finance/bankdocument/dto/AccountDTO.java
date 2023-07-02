@@ -1,7 +1,12 @@
 package com.veeteq.finance.bankdocument.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class AccountDTO {
+    @JsonProperty(value = "id")
     private Long id;
+
+    @JsonProperty(value = "displayName")
     private String name;
 
     public Long getId() {

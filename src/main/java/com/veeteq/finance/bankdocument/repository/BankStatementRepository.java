@@ -11,18 +11,16 @@ import com.veeteq.finance.bankdocument.model.BankStatement;
 
 public interface BankStatementRepository extends JpaRepository<BankStatement, Long> {
 
-    @Query(value = "SELECT bs FROM BankStatement bs JOIN FETCH bs.account",
+    @Query(value = "SELECT bs FROM BankStatement bs",
            countQuery = "SELECT count(bs) FROM BankStatement bs")
     Page<BankStatement> findAllWithAccount(PageRequest pageRequest);
 
     @Query(value = "SELECT bs FROM BankStatement bs "
-            + "               JOIN FETCH bs.account "
             + "               LEFT JOIN FETCH bs.details",
             countQuery = "SELECT count(bs) FROM BankStatement bs")
-     Page<BankStatement> findAllWithAccountAndDetails(PageRequest pageRequest);
+     Page<BankStatement> findAllWithDetails(PageRequest pageRequest);
 
     @Query(value = "SELECT bs FROM BankStatement bs "
-            + "       JOIN FETCH bs.account "
             + "       LEFT JOIN FETCH bs.details"
             + "      WHERE bs.id = :id")
     Optional<BankStatement> findByIdWithDetails(Long id);

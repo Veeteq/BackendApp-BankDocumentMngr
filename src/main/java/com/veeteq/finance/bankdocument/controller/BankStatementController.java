@@ -44,47 +44,47 @@ public class BankStatementController {
 
     private final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule());
-    
+
     @Autowired
     public BankStatementController(BankStatementService bankStatementService) {
-        this.bankStatementService = bankStatementService;        
+        this.bankStatementService = bankStatementService;
     }
-    
+
     @GetMapping(path = "/{id}")
     public ResponseEntity<BankStatementDTO> getById(@PathVariable("id") Long id) throws ResourceNotFoundException {
         LOG.info("Processing get request and retrieving single statment with id: " + id);
-        
+
         BankStatementDTO bankStatement = bankStatementService.findById(id);
-        
+
         return ResponseEntity.ok(bankStatement);
     }
-    
+
     @GetMapping(path = "/{id}/counterparty")
-    public ResponseEntity<?> searchForCounterparties(@PathVariable("id") Long id) throws ResourceNotFoundException {
+    public ResponseEntity<List<BankDataDTO>> searchForCounterparties(@PathVariable("id") Long id) throws ResourceNotFoundException {
         LOG.info("Processing request to find couterparties for statment with id: " + id);
-        
+
         List<BankDataDTO> bankData = bankStatementService.getBankDataById(id);
         bankStatementService.searchForCounterparty(bankData);
-        
+
         return ResponseEntity.ok().build();
     }
 
     @GetMapping(path = "/{id}/file")
     public ResponseEntity<ByteArrayResource> findFileById(@PathVariable(name = "id", required = true) Long id) {
         LOG.info("Processing get request and retrieving file attachement for statment with id: " + id);
-        
+
         ResponseEntity<ByteArrayResource> response = bankStatementService.findFileById(id);
-        
+
         return response;
     }
-        
+
     @GetMapping(path = "/summary", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> getSummary(@RequestParam(name = "page",   defaultValue = "0") int page,
                                         @RequestParam(name = "size",   defaultValue = "10") int size,
                                         @RequestParam(name = "column", defaultValue = "id") String column,
                                         @RequestParam(name = "dir",    defaultValue = "ASC") String dir) {
         LOG.info("Processing getSummary request: page=" + page + ", size=" + size + ", column: " + column + ", dir: " + dir);
-        
+
         Sort.Direction sortDir = dir.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
         Sort.Order order = new Sort.Order(sortDir, column).ignoreCase();
         Sort sort = Sort.by(order);
@@ -94,9 +94,9 @@ public class BankStatementController {
 
         return ResponseEntity.ok(response);
     }
-    
+
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<BankStatementDTO> save(@RequestPart(name = "document", required = true)  String json, 
+    public ResponseEntity<BankStatementDTO> save(@RequestPart(name = "document", required = true)  String json,
                                                  @RequestPart(name = "file",     required = false) MultipartFile file) {
         LOG.info("Processing post request and saving a new document");
 
@@ -119,24 +119,31 @@ public class BankStatementController {
                 .toUri();
         return ResponseEntity.created(location).body(savedDocument);
     }
-    
+
     @PostMapping(path = "/parse", consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
-    public ResponseEntity<BankStatementDTO> parse(@RequestParam(name = "accountId", required = true) Long accountId, 
+    public ResponseEntity<BankStatementDTO> parse(@RequestParam(name = "accountId", required = true) Long accountId,
                                                   @RequestPart(name = "file",       required = true) MultipartFile file) {
       LOG.info("Processing post request and parsing a new document of: " + file.getContentType());
 
-      BankStatementDTO parsed = bankStatementService.parseDocument(accountId, file);       
-      
+      BankStatementDTO parsed = bankStatementService.parseDocument(accountId, file);
+
       LOG.info(MessageFormat.format("item with id {0} created", parsed.getId()));
-      
+
       return ResponseEntity.ok().body(parsed);
-    }    
-    
+    }
+
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws ResourceNotFoundException {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) throws ResourceNotFoundException {
         LOG.info("Processing delete request of bank statement with id: " + id);
 
         bankStatementService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(path = "/details")
+    public ResponseEntity<?> getDetails() {
+        LOG.info("Processing request for bank statement details");
+
         return ResponseEntity.noContent().build();
     }
 }
