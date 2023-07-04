@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Version;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -20,7 +21,8 @@ public abstract class BaseEntity<E> implements Serializable {
     @UpdateTimestamp
     @Column(name = "updt_dt", nullable = false, updatable = true)
     private LocalDateTime updateDateTime;
-    
+
+    @Version
     @Column(name = "vers_nm")
     private Integer version;
     

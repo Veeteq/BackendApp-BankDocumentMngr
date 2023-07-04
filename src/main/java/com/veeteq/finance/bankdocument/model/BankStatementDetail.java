@@ -8,9 +8,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.veeteq.finance.bankdocument.util.DateUtil;
@@ -22,6 +25,8 @@ public class BankStatementDetail extends BaseEntity<BankStatement> {
 
     @Id
     @Column(name = "deta_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "deta_seq")
+    @SequenceGenerator(name = "deta_seq", sequenceName = "bank_statement_details_seq", allocationSize = 1)
     private Long id;
     
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})

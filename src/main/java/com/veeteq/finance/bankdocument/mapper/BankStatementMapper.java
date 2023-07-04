@@ -47,6 +47,7 @@ public class BankStatementMapper {
         }
 
         BankStatement entity = new BankStatement()
+                .setId(dto.getId() != null ? dto.getId() : utilityRepository.getBankStatementId())
                 .setReportDate(dto.getStatementDate())
                 .setOpeningAmount(dto.getOpeningBalance())
                 .setClosingAmount(dto.getClosingBalance())
@@ -64,7 +65,7 @@ public class BankStatementMapper {
 
         AccountDTO account = accountService.getById(entity.getAccountId());
         BankStatementSummaryDTO dto = new BankStatementSummaryDTO()
-                .setId(entity.getId() != null ? entity.getId() : utilityRepository.getBankStatementId())
+                .setId(entity.getId())
                 .setAccount(account)
                 .setFileName(entity.getFileName())
                 .setReportDate(entity.getReportDate())
@@ -78,7 +79,7 @@ public class BankStatementMapper {
 
     public BankStatementDetailDTO toDto(BankStatementDetail entity) {
         BankStatementDetailDTO dto = new BankStatementDetailDTO()
-                .setId(entity.getId() != null ? entity.getId() : utilityRepository.getBankStatementDetailId())
+                .setId(entity.getId())
                 .setSequenceNumber(entity.getSequenceNumber())
                 .setOperationDate(entity.getOperationDate())
                 .setOperationType(entity.getOperationType().getCode())

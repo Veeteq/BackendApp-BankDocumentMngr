@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Profile(value = {"default", "dev"})
 public class UtilityRepositoryDefault implements UtilityRepository {
-    private final int bound = 5;
+    private final int bound = 5000;
     
     @PersistenceContext
     private final EntityManager entityManager;
