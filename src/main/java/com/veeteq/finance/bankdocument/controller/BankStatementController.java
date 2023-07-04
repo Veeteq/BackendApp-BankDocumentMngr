@@ -2,6 +2,7 @@ package com.veeteq.finance.bankdocument.controller;
 
 import java.net.URI;
 import java.text.MessageFormat;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -29,9 +31,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.veeteq.finance.bankdocument.dto.BankDataDTO;
 import com.veeteq.finance.bankdocument.dto.BankStatementDTO;
+import com.veeteq.finance.bankdocument.dto.BankStatementDetailDTO;
 import com.veeteq.finance.bankdocument.dto.BankStatementSummaryDTO;
 import com.veeteq.finance.bankdocument.dto.PageResponse;
 import com.veeteq.finance.bankdocument.exception.ResourceNotFoundException;
+import com.veeteq.finance.bankdocument.service.BankStatementDetailService;
 import com.veeteq.finance.bankdocument.service.BankStatementService;
 
 @RestController
@@ -41,13 +45,15 @@ public class BankStatementController {
     private final Logger LOG = LoggerFactory.getLogger(BankStatementController.class);
 
     private final BankStatementService bankStatementService;
+    private final BankStatementDetailService bankStatementDetailService;
 
     private final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule());
 
     @Autowired
-    public BankStatementController(BankStatementService bankStatementService) {
+    public BankStatementController(BankStatementService bankStatementService, BankStatementDetailService bankStatementDetailService) {
         this.bankStatementService = bankStatementService;
+        this.bankStatementDetailService = bankStatementDetailService;
     }
 
     @GetMapping(path = "/{id}")
@@ -127,7 +133,7 @@ public class BankStatementController {
 
       BankStatementDTO parsed = bankStatementService.parseDocument(accountId, file);
 
-      LOG.info(MessageFormat.format("item with id {0} created", parsed.getId()));
+      LOG.info(MessageFormat.format("file {0} parsed successfully, number of details: {1}", file.getOriginalFilename(), parsed.getDetails().size()));
 
       return ResponseEntity.ok().body(parsed);
     }
@@ -141,9 +147,10 @@ public class BankStatementController {
     }
 
     @GetMapping(path = "/details")
-    public ResponseEntity<?> getDetails() {
-        LOG.info("Processing request for bank statement details");
+    public ResponseEntity<List<BankStatementDetailDTO>> getDetails(@RequestParam(name = "date", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        LOG.info("Requesting bank statement details for: " + date);
 
-        return ResponseEntity.noContent().build();
+        List<BankStatementDetailDTO> bankStatementDetails = bankStatementDetailService.findByOperationDate(date);
+        return ResponseEntity.ok(bankStatementDetails);
     }
 }

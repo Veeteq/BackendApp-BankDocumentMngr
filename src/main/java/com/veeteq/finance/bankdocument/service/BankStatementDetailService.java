@@ -1,8 +1,16 @@
 package com.veeteq.finance.bankdocument.service;
 
+import com.veeteq.finance.bankdocument.dto.BankStatementDetailDTO;
+import com.veeteq.finance.bankdocument.mapper.BankStatementMapper;
 import com.veeteq.finance.bankdocument.repository.BankStatementDetailRepository;
+import com.veeteq.finance.bankdocument.repository.UtilityRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -10,14 +18,26 @@ import javax.transaction.Transactional;
 public class BankStatementDetailService {
 
   private final BankStatementDetailRepository bankStatementDetailRepository;
+  private final BankStatementMapper bankStatementMapper;
 
   @Autowired
-  public BankStatementDetailService(BankStatementDetailRepository bankStatementDetailRepository) {
+  public BankStatementDetailService(BankStatementDetailRepository bankStatementDetailRepository,
+                                    AccountService accountService,
+                                    UtilityRepository utilityRepository) {
     this.bankStatementDetailRepository = bankStatementDetailRepository;
+    this.bankStatementMapper = new BankStatementMapper(accountService, utilityRepository);
   }
 
   @Transactional
   public int setCounterpartyId(Long counterpartyId, Long id) {
     return bankStatementDetailRepository.setCounterpartyId(counterpartyId, id);
+  }
+
+  public List<BankStatementDetailDTO> findByOperationDate(LocalDate date) {
+    List<BankStatementDetailDTO> result = bankStatementDetailRepository.findByOperationDate(date)
+            .stream()
+            .map(bankStatementMapper::toDto)
+            .collect(Collectors.toList());
+    return result;
   }
 }
