@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 
 @FeignClient(url = "http://localhost:9194", name = "budget-manager")
-public interface HomeBudgetMngrClient {
+public interface HomeBudgetMngrAPIClient {
 
   @GetMapping(path = "/api/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
   @Cacheable(cacheNames = "accounts", key = "#id")
