@@ -37,19 +37,19 @@ public class BankStatementService {
     
     @Autowired
     public BankStatementService(BankStatementRepository bankStatementRepository,
-                                AccountService accountService,
                                 MessageQueueService messageQueueService,
+                                AccountService accountService,
                                 UtilityRepository utilityRepository) {
-        this.accountService = accountService;
         this.bankStatementRepository = bankStatementRepository;
         this.messageQueueService = messageQueueService;
+        this.accountService = accountService;
 
         this.mapper = new BankStatementMapper(accountService, utilityRepository);
     }
 
     @Transactional
     public BankStatementDTO saveDocument(BankStatementDTO bankStatementDto, MultipartFile file) {
-        LOG.info("saveBankStatement");
+        LOG.info("Saving BankStatement into database");
         
         AccountDTO account = accountService.getById(bankStatementDto.getAccount().getId());
         
@@ -70,24 +70,24 @@ public class BankStatementService {
         return response;
     }
     
-    public BankStatementDTO parseDocument(Long accountId, MultipartFile document) {
+    public BankStatementDTO parseDocument(Long accountId, MultipartFile file) {
         AccountDTO account = accountService.getById(accountId);
         
-        UploadProcessor processor = UploadProcessorFactory.getUploadProcessor(document.getContentType());
+        UploadProcessor processor = UploadProcessorFactory.getUploadProcessor(file.getContentType());
 
         BankStatementDTO bankStatement = null;
 
         try {
-            bankStatement = processor.process(document.getInputStream());
+            bankStatement = processor.process(file.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         bankStatement
         .setAccount(account)
-        .setSize(document.getSize())
-        .setContentType(document.getContentType())
-        .setFileName(document.getOriginalFilename());
+        .setSize(file.getSize())
+        .setContentType(file.getContentType())
+        .setFileName(file.getOriginalFilename());
 
         return bankStatement;
     }

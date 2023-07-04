@@ -76,7 +76,7 @@ public class BankStatementMapper {
         return dto;
     }
 
-    private BankStatementDetailDTO toDto(BankStatementDetail entity) {
+    public BankStatementDetailDTO toDto(BankStatementDetail entity) {
         BankStatementDetailDTO dto = new BankStatementDetailDTO()
                 .setId(entity.getId() != null ? entity.getId() : utilityRepository.getBankStatementDetailId())
                 .setSequenceNumber(entity.getSequenceNumber())
