@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,11 +23,13 @@ import com.veeteq.finance.bankdocument.util.NumberUtil;
 
 public class MBankProcessor implements UploadProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(MBankProcessor.class.getSimpleName());
-        
+
+    private final String dateRegex = "(\\d{4}-\\d{2}-\\d{2})";
+
     @Override
     public BankStatementDTO process(InputStream inputStream) {
         
-        BankStatementDTO bankStatement = new BankStatementDTO();
+        final BankStatementDTO bankStatement = new BankStatementDTO();
         
         
         try {
@@ -33,26 +37,54 @@ public class MBankProcessor implements UploadProcessor {
             LOG.info(document.title());
             
             Elements tables = document.select("table");
-            LOG.info("found: " + tables.size() + " tables.");
-            
-            Element table = tables.get(5);
-            Elements tableRows = table.select("tr");
-            
-            AtomicInteger idx = new AtomicInteger(1);
-            
-            tableRows.stream()
-            .skip(3)
-            .map(row -> parseRecord(row))
-            .filter(detail -> detail != null)
-            .peek(detail -> detail.setSequenceNumber(idx.getAndIncrement()))
-            .forEach(bankStatement::addToDetails);
-            
-            
+
+            parseDetailsTable(bankStatement, tables.get(5));
+            parseStatementDate(bankStatement, tables.get(0));
+
+            BigDecimal openingBalance = parseBalanceAmount(tables.get(6));
+            bankStatement.setOpeningBalance(openingBalance);
+
+            BigDecimal closingBalance = parseBalanceAmount(tables.get(7));
+            bankStatement.setClosingBalance(closingBalance);
         } catch (IOException e) {
             e.printStackTrace();
         }
         
         return bankStatement;
+    }
+
+    private void parseDetailsTable(BankStatementDTO bankStatement, Element table) {
+        Elements tableRows = table.select("tr");
+
+        AtomicInteger idx = new AtomicInteger(1);
+
+        tableRows.stream()
+                .skip(3)
+                .map(row -> parseRecord(row))
+                .filter(detail -> detail != null)
+                .peek(detail -> detail.setSequenceNumber(idx.getAndIncrement()))
+                .forEach(bankStatement::addToDetails);
+    }
+
+    private void parseStatementDate(BankStatementDTO bankStatement, Element table) {
+        Elements children = table.children().get(0).children().get(0).children().get(0).children();
+        Element element = children.get(4);
+        String value = element.text();
+
+        Pattern pattern = Pattern.compile(dateRegex);
+        Matcher matcher = pattern.matcher(value);
+
+        if (matcher.find()) {} //skip first occurence
+        if (matcher.find()) {
+            LocalDate date = DateUtil.parse(matcher.group(1));
+            bankStatement.setStatementDate(date);
+        }
+    }
+
+    private BigDecimal parseBalanceAmount(Element table) {
+        Element element = table.children().get(0);
+        Element td = element.getElementsByTag("td").get(1);
+        return NumberUtil.convertTo(td.text(), ',', ' ', "-");
     }
 
     private BankStatementDetailDTO parseRecord(Element row) {
