@@ -1,6 +1,6 @@
 package com.veeteq.finance.bankdocument.service;
 
-import com.veeteq.finance.bankdocument.dto.BankStatementDetailDTO;
+import com.veeteq.finance.bankdocument.dto.BankStatementInfoDTO;
 import com.veeteq.finance.bankdocument.mapper.BankStatementMapper;
 import com.veeteq.finance.bankdocument.repository.BankStatementDetailRepository;
 import com.veeteq.finance.bankdocument.repository.UtilityRepository;
@@ -33,10 +33,10 @@ public class BankStatementDetailService {
     return bankStatementDetailRepository.setCounterpartyId(counterpartyId, id);
   }
 
-  public List<BankStatementDetailDTO> findByOperationDate(LocalDate date) {
-    List<BankStatementDetailDTO> result = bankStatementDetailRepository.findByOperationDate(date)
+  public List<BankStatementInfoDTO> findByOperationDate(LocalDate date) {
+    List<BankStatementInfoDTO> result = bankStatementDetailRepository.findByOperationDate(date)
             .stream()
-            .map(bankStatementMapper::toDto)
+            .map(bankStatementMapper::toInfo)
             .collect(Collectors.toList());
     return result;
   }

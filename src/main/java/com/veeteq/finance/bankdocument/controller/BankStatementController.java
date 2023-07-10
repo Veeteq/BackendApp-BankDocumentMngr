@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.veeteq.finance.bankdocument.dto.BankDataDTO;
 import com.veeteq.finance.bankdocument.dto.BankStatementDTO;
-import com.veeteq.finance.bankdocument.dto.BankStatementDetailDTO;
+import com.veeteq.finance.bankdocument.dto.BankStatementInfoDTO;
 import com.veeteq.finance.bankdocument.dto.BankStatementSummaryDTO;
 import com.veeteq.finance.bankdocument.dto.PageResponse;
 import com.veeteq.finance.bankdocument.exception.ResourceNotFoundException;
@@ -146,11 +146,17 @@ public class BankStatementController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Endpoint for BankDocumentManager
+     * Enable searching for BankStatementDetails by date
+     * @param date
+     * @return
+     */
     @GetMapping(path = "/details")
-    public ResponseEntity<List<BankStatementDetailDTO>> getDetails(@RequestParam(name = "date", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+    public ResponseEntity<List<BankStatementInfoDTO>> getDetails(@RequestParam(name = "date", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         LOG.info("Requesting bank statement details for: " + date);
 
-        List<BankStatementDetailDTO> bankStatementDetails = bankStatementDetailService.findByOperationDate(date);
+        List<BankStatementInfoDTO> bankStatementDetails = bankStatementDetailService.findByOperationDate(date);
         return ResponseEntity.ok(bankStatementDetails);
     }
 }
