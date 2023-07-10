@@ -1,5 +1,5 @@
 #Start with a base image containing Java runtime
-FROM openjdk:11-slim as build
+FROM openjdk:17-slim as build
 
 #Declare user and group
 RUN addgroup --system spring && adduser --system --group spring

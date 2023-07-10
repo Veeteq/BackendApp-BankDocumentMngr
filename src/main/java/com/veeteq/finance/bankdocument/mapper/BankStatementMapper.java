@@ -3,6 +3,7 @@ package com.veeteq.finance.bankdocument.mapper;
 import java.math.BigDecimal;
 
 import com.veeteq.finance.bankdocument.dto.*;
+import com.veeteq.finance.bankdocument.dto.BankStatementInfoDTO;
 import com.veeteq.finance.bankdocument.model.BankStatement;
 import com.veeteq.finance.bankdocument.model.BankStatementDetail;
 import com.veeteq.finance.bankdocument.model.FileType;
@@ -125,5 +126,22 @@ public class BankStatementMapper {
                 .setCounterpartyAddress(entity.getCounterpartyAddress())
                 .setTitle(entity.getTitle());
       return bankData;
+    }
+
+    public BankStatementInfoDTO toInfo(BankStatementDetail entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        BankStatementInfoDTO dto = new BankStatementInfoDTO()
+                .setId(entity.getId())
+                .setSequenceNumber(entity.getSequenceNumber())
+                .setOperationType(entity.getOperationType().getCode())
+                .setOperationDate(entity.getOperationDate())
+                .setTitle(entity.getTitle())
+                .setAccountId(entity.getBankStatement().getAccountId())
+                .setCounterpartyId(entity.getCounterpartyId())
+                .setAmount(entity.getAmount());
+        return dto;
     }
 }

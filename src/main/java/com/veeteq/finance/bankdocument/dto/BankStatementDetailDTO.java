@@ -12,22 +12,23 @@ public class BankStatementDetailDTO {
 
     private Long id;
     private Integer sequenceNumber;
+    private String operationType;
 
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate operationDate;
-
-    private String operationType;
     
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate postingDate;
 
     private String title;
+
     private Long counterpartyId;
     private String counterpartyName;
     private String counterpartyIban;
     private String counterpartyAddress;
+
     private BigDecimal amount;
     private BigDecimal balance;
 
