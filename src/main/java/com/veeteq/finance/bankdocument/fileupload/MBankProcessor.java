@@ -101,7 +101,7 @@ public class MBankProcessor implements UploadProcessor {
             .setPostingDate(postingDate)
             .setOperationType(OperationType.findByCode(operationDetails.getOperationType()).name())
             .setTitle(operationDetails.getTitle())
-            .setCounterpartyIban(operationDetails.getAccountNumber())
+            .setCounterpartyIban(operationDetails.getIban())
             .setCounterpartyName(operationDetails.getCounterparty())
             .setCounterpartyAddress(operationDetails.getCounterpartyAddress())
             .setAmount(operationAmount)
@@ -122,12 +122,12 @@ public class MBankProcessor implements UploadProcessor {
         case 5:            
             operationDetails.setCounterparty(cell.textNodes().get(1).text());
             operationDetails.setCounterpartyAddress(cell.textNodes().get(2).text());
-            operationDetails.setAccountNumber(cell.textNodes().get(3).text());
+            operationDetails.setIban(cell.textNodes().get(3).text());
             operationDetails.setTitle(cell.textNodes().get(4).text());
             break;
         case 4:
             operationDetails.setCounterparty(cell.textNodes().get(1).text());
-            operationDetails.setAccountNumber(cell.textNodes().get(2).text());
+            operationDetails.setIban(cell.textNodes().get(2).text());
             operationDetails.setTitle(cell.textNodes().get(3).text());
             break;
         case 2:
@@ -147,7 +147,7 @@ public class MBankProcessor implements UploadProcessor {
         private String title;
         private String counterparty;
         private String counterpartyAddress;
-        private String accountNumber;
+        private String iban;
         private LocalDate operationDate;        
         
         
@@ -198,12 +198,12 @@ public class MBankProcessor implements UploadProcessor {
             return this;
         }
 
-        public String getAccountNumber() {
-            return accountNumber;
+        public String getIban() {
+            return iban;
         }
 
-        public OperationDetails setAccountNumber(String accountNumber) {
-            this.accountNumber = accountNumber;
+        public OperationDetails setIban(String iban) {
+            this.iban = iban;
             return this;
         }
 
@@ -213,7 +213,7 @@ public class MBankProcessor implements UploadProcessor {
 
         @Override
         public String toString() {
-            return "OperationDetails [operationType=" + operationType + ", title=" + title + ", counterparty=" + counterparty + ", counterpartyAddress=" + counterpartyAddress + ", accountNumber=" + accountNumber + ", operationDate=" + operationDate + "]";
+            return "OperationDetails [operationType=" + operationType + ", title=" + title + ", counterparty=" + counterparty + ", counterpartyAddress=" + counterpartyAddress + ", iban=" + iban + ", operationDate=" + operationDate + "]";
         }
 
     }

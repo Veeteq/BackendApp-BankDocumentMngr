@@ -121,7 +121,7 @@ public class BankStatementMapper {
 
       BankDataDTO bankData = new BankDataDTO()
                 .setId(entity.getId())
-                .setAccountNumber(entity.getCounterpartyIban())
+                .setIban(entity.getCounterpartyIban())
                 .setCounterparty(entity.getCounterpartyName())
                 .setCounterpartyAddress(entity.getCounterpartyAddress())
                 .setTitle(entity.getTitle());
