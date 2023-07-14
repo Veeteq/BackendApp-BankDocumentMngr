@@ -12,12 +12,12 @@ public class BankDataDTO implements Serializable {
 
     @JsonProperty(value = "id")
     private Long id;
-    
+
     @JsonProperty(value = "title")
     private String title;
 
     @JsonProperty(value = "counterpartyIban")
-    private String accountNumber;
+    private String iban;
 
     @JsonProperty(value = "counterpartyName")
     private String counterparty;
@@ -43,12 +43,12 @@ public class BankDataDTO implements Serializable {
         return this;
     }
 
-    public String getAccountNumber() {
-        return accountNumber;
+    public String getIban() {
+        return iban;
     }
 
-    public BankDataDTO setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
+    public BankDataDTO setIban(String iban) {
+        this.iban = iban;
         return this;
     }
 
