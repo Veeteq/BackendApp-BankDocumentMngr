@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Profile(value = {"default", "dev"})
 public class UtilityRepositoryDefault implements UtilityRepository {
-    private final int bound = 5000;
+    private final int bound = 20000;
     
     @PersistenceContext
     private final EntityManager entityManager;
@@ -39,17 +39,28 @@ public class UtilityRepositoryDefault implements UtilityRepository {
     }
     
     @Override
-    public Long getBankStatementDetailId() {
+    public Long[] getBankStatementDetailId(int limit) {
+        Long[] resultSet = new Long[limit];
+
+        int i = 0;
+        while (i < limit) {
+            resultSet[i] = generateRandomIdx();
+            i++;
+        }
+        return resultSet;
+    }
+
+    private Long generateRandomIdx() {
         Random rnd = new Random();
         long nextLong = 0;
         long count = 0;
-        
-        TypedQuery<Long> query = entityManager.createQuery("SELECT Count(bd) FROM BankStatementDetail bd WHERE bd.id = :id", Long.class);               
+
+        TypedQuery<Long> query = entityManager.createQuery("SELECT Count(bd) FROM BankStatementDetail bd WHERE bd.id = :id", Long.class);
         do {
             nextLong = rnd.nextInt(bound);
-            count = query.setParameter("id", nextLong).getSingleResult();            
+            count = query.setParameter("id", nextLong).getSingleResult();
         } while(count > 0);
-        
+
         return nextLong;
     }
 }

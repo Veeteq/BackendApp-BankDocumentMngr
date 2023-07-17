@@ -1,6 +1,7 @@
 package com.veeteq.finance.bankdocument.mapper;
 
 import java.math.BigDecimal;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.veeteq.finance.bankdocument.dto.*;
 import com.veeteq.finance.bankdocument.dto.BankStatementInfoDTO;
@@ -55,9 +56,15 @@ public class BankStatementMapper {
                 .setFileName(dto.getFileName())
                 .setFileType(FileType.findByCode(dto.getContentType()));
 
+        Long[] detailIds = utilityRepository.getBankStatementDetailId(dto.getDetails().size());
+        AtomicInteger idx = new AtomicInteger(0);
+
         dto.getDetails().stream()
         .map(this::toEntity)
-        .forEach(entity::addToDetails);
+        .forEach(detail -> {
+            detail.setId(detail.getId() == null ? detailIds[idx.getAndIncrement()] : detail.getId());
+            entity.addToDetails(detail);
+        });
 
         return entity;
     }

@@ -4,6 +4,6 @@ public interface UtilityRepository {
 
     Long getBankStatementId();
 
-    Long getBankStatementDetailId();
+    Long[] getBankStatementDetailId(int limit);
 
 }
