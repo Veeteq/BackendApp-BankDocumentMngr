@@ -8,7 +8,7 @@ RUN addgroup --system spring && adduser --system --group spring
 USER spring:spring
 
 #Add the application jar to the container
-COPY target/bank-statement-0.0.1-SNAPSHOT.jar app.jar
+COPY target/bank-statement.jar app.jar
 
 #Execute the application
 ENTRYPOINT ["java","-jar","/app.jar"]
