@@ -1,12 +1,13 @@
 package com.veeteq.finance.bankdocument.service;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import com.veeteq.finance.bankdocument.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.veeteq.finance.bankdocument.dto.AccountDTO;
+import com.veeteq.finance.bankdocument.dto.BankDataDTO;
+import com.veeteq.finance.bankdocument.dto.BankStatementDTO;
+import com.veeteq.finance.bankdocument.dto.BankStatementSummaryDTO;
+import com.veeteq.finance.bankdocument.dto.PageResponse;
 import com.veeteq.finance.bankdocument.exception.ResourceNotFoundException;
 import com.veeteq.finance.bankdocument.fileupload.UploadProcessor;
 import com.veeteq.finance.bankdocument.fileupload.UploadProcessorFactory;
@@ -78,7 +84,16 @@ public class BankStatementService {
             e.printStackTrace();
         }
 
+
+        LocalDate periodStart = bankStatement.getStatementDate().with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate periodEnd = bankStatement.getStatementDate().with(TemporalAdjusters.lastDayOfMonth());
+        Long bankStatementId = bankStatementRepository
+                .findByAccountIdAndReportDateBetween(accountId, periodStart, periodEnd)
+                .map(bs -> bs.getId())
+                .orElse(null);
+
         bankStatement
+        .setId(bankStatementId)
         .setAccount(account)
         .setSize(file.getSize())
         .setContentType(file.getContentType())

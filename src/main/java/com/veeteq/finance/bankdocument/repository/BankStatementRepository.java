@@ -1,5 +1,6 @@
 package com.veeteq.finance.bankdocument.repository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -25,5 +26,7 @@ public interface BankStatementRepository extends JpaRepository<BankStatement, Lo
             + "      WHERE bs.id = :id")
     Optional<BankStatement> findByIdWithDetails(Long id);
 
-    
+
+    Optional<BankStatement> findByAccountIdAndReportDateBetween(Long accountId, LocalDate start, LocalDate end);
+
 }
