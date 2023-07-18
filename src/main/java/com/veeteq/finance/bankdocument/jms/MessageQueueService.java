@@ -25,7 +25,7 @@ import com.veeteq.finance.bankdocument.dto.BankDataDTO;
 public class MessageQueueService {
 
     private final JmsTemplate jmsTemplate;
-    
+
     @Autowired
     public MessageQueueService(JmsTemplate jmsTemplate) {
         this.jmsTemplate = jmsTemplate;

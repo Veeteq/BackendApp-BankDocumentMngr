@@ -119,6 +119,13 @@ public class BankStatementController {
 
         LOG.info(MessageFormat.format("item with id {0} created", savedDocument.getId()));
 
+        /**
+         * Register all bank statement details to message queue
+         * before sending the response back to the caller
+         */
+        List<BankDataDTO> bankData = bankStatementService.getBankDataById(savedDocument.getId());
+        bankStatementService.searchForCounterparty(bankData);
+
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(savedDocument.getId())

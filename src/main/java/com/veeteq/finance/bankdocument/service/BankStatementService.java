@@ -14,6 +14,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +35,7 @@ public class BankStatementService {
     private final AccountService accountService;
     private final BankStatementMapper mapper;
     private final MessageQueueService messageQueueService;
-    
+
     @Autowired
     public BankStatementService(BankStatementRepository bankStatementRepository,
                                 MessageQueueService messageQueueService,
@@ -50,29 +51,23 @@ public class BankStatementService {
     @Transactional
     public BankStatementDTO saveDocument(BankStatementDTO bankStatementDto, MultipartFile file) {
         LOG.info("Saving BankStatement into database");
-        
+
         AccountDTO account = accountService.getById(bankStatementDto.getAccount().getId());
-        
+
         BankStatement bankStatement = mapper.toEntity(bankStatementDto);
         bankStatement.setAccountId(account.getId());
         bankStatement.setAttachment(fileToBytes(file));
-        
-        BankStatement savedBankStatement = bankStatementRepository.save(bankStatement);
-        
-        BankStatementDTO response = mapper.toDto(savedBankStatement);
 
-        /**
-         * Register all bank statement details to message queue
-         * before sending the response back to the caller
-         */
-        //messageQueueService.registerBankStatement(response);
+        BankStatement savedBankStatement = bankStatementRepository.save(bankStatement);
+
+        BankStatementDTO response = mapper.toDto(savedBankStatement);
 
         return response;
     }
-    
+
     public BankStatementDTO parseDocument(Long accountId, MultipartFile file) {
         AccountDTO account = accountService.getById(accountId);
-        
+
         UploadProcessor processor = UploadProcessorFactory.getUploadProcessor(file.getContentType());
 
         BankStatementDTO bankStatement = null;
@@ -94,7 +89,7 @@ public class BankStatementService {
 
     public BankStatementDTO findById(Long id) {
         LOG.info("Retrieving bank statement with id: " + id);
-        
+
         BankStatement savedBankStatement = bankStatementRepository
         .findByIdWithDetails(id)
         .orElseThrow(() -> new ResourceNotFoundException("Bank Statement not found for this id :: " + id));
@@ -121,13 +116,13 @@ public class BankStatementService {
 
     public PageResponse<BankStatementSummaryDTO> findAll(PageRequest pageRequest) {
         LOG.info("getSummary: page=" + pageRequest.getPageNumber() + ", size=" + pageRequest.getPageSize() + ", sort=[" + pageRequest.getSort().toString() + ']');
-        
+
         Page<BankStatement> page = bankStatementRepository.findAllWithDetails(pageRequest);
         List<BankStatementSummaryDTO> content = page.getContent()
                 .stream()
                 .map(mapper::toSummaryDto)
                 .collect(Collectors.toList());
-        
+
         PageResponse<BankStatementSummaryDTO> response = new PageResponse<BankStatementSummaryDTO>()
                 .setContent(content)
                 .setPageNo(page.getNumber())
@@ -141,34 +136,35 @@ public class BankStatementService {
 
     public void delete(Long id) throws ResourceNotFoundException {
         LOG.info("Deleting bank statement with id: " + id);
-        
+
         BankStatement savedBankStatement = bankStatementRepository.getReferenceById(id);
-        
+
         bankStatementRepository.delete(savedBankStatement);
     }
 
     public ResponseEntity<ByteArrayResource> findFileById(Long id) {
         LOG.info("Retrieving file attachement for bank statement with id: " + id);
-        
+
         BankStatement savedBankStatement = bankStatementRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Bank Statement not found for this id :: " + id));
-        
+
         Byte[] attachment = savedBankStatement.getAttachment();
         ByteArrayResource resource = new ByteArrayResource(toByteArray(attachment), savedBankStatement.getFileName());
-        
+
         return ResponseEntity
                 .ok()
                 .contentLength(resource.contentLength())
                 .contentType(savedBankStatement.getFileType().getMediaType())
-                .body(resource);              
+                .body(resource);
     }
 
+    @Async
     public void searchForCounterparty(List<BankDataDTO> bankData) {
         /**
          * Register all bank statement details to message queue
          */
-        messageQueueService.registerBankStatement(bankData);        
+        messageQueueService.registerBankStatement(bankData);
     }
 
     private byte[] toByteArray(Byte[] objBytes) {
