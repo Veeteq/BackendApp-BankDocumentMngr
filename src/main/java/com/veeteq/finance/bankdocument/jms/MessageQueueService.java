@@ -37,7 +37,7 @@ public class MessageQueueService {
         ObjectMapper mapper = new ObjectMapper();
 
         bankData.stream()
-                .limit(3)
+                .filter(detail -> detail.getIban() != null)
                 .forEach(detail -> {
                     System.out.println("registering bank statement detail: " + detail.getTitle());
 
