@@ -44,7 +44,7 @@ public class UtilityRepositoryOracle implements UtilityRepository {
         Long[] resultSet = new Long[limit];
 
         try (Session session = entityManager.unwrap(Session.class)) {
-            ProcedureCall call = session.createStoredProcedureCall("p_get_details_id");
+            ProcedureCall call = session.createStoredProcedureCall("p_get_bank_statement_detail_ids");
             call.registerParameter(1, Long.class, ParameterMode.IN).bindValue(Long.valueOf(limit));
             call.registerParameter(2, Integer.class, ParameterMode.REF_CURSOR);
             Output output = call.getOutputs().getCurrent();

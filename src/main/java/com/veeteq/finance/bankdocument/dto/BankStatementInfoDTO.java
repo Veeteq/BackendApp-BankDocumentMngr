@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class BankStatementInfoDTO {
-  private Long id;
+  private Long detailId;
   private Integer sequenceNumber;
   private String operationType;
 
@@ -22,12 +22,12 @@ public class BankStatementInfoDTO {
   private Long counterpartyId;
   private BigDecimal amount;
 
-  public Long getId() {
-    return id;
+  public Long getDetailId() {
+    return detailId;
   }
 
-  public BankStatementInfoDTO setId(Long id) {
-    this.id = id;
+  public BankStatementInfoDTO setDetailId(Long detailId) {
+    this.detailId = detailId;
     return this;
   }
 

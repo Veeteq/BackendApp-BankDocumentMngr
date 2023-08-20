@@ -2,15 +2,17 @@ package com.veeteq.finance.bankdocument.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.Table;
 
 import com.veeteq.finance.bankdocument.util.DateUtil;
@@ -20,16 +22,16 @@ import com.veeteq.finance.bankdocument.util.DateUtil;
 public class BankStatementDetail extends BaseEntity<BankStatement> {
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name = "deta_id")
-    private Long id;
-    
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @EmbeddedId
+    private BankStatementDetailId id;
+
+    @ManyToOne(optional = false, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "stmt_id", referencedColumnName = "stmt_id", nullable = false)
+    @MapsId(value = "bankStatementId")
     private BankStatement bankStatement;
-    
-    @Column(name = "sequ_nm") 
-    private Integer sequenceNumber;
+
+    @Column(name = "deta_id")
+    private Long detailId;
     
     @Column(name = "oper_dt")
     private LocalDate operationDate; 
@@ -61,16 +63,16 @@ public class BankStatementDetail extends BaseEntity<BankStatement> {
     
     @Column(name = "bala_am")
     private BigDecimal balance;
-    
-    public Long getId() {
-        return this.id;
+
+    public BankStatementDetailId getId() {
+        return id;
     }
-    
-    public BankStatementDetail setId(Long id) {
+
+    public BankStatementDetail setId(BankStatementDetailId id) {
         this.id = id;
         return this;
     }
-    
+
     public BankStatement getBankStatement() {
         return bankStatement;
     }
@@ -80,12 +82,12 @@ public class BankStatementDetail extends BaseEntity<BankStatement> {
         return this;
     }
 
-    public Integer getSequenceNumber() {
-        return sequenceNumber;
+    public Long getDetailId() {
+        return this.detailId;
     }
 
-    public BankStatementDetail setSequenceNumber(Integer sequenceNumber) {
-        this.sequenceNumber = sequenceNumber;
+    public BankStatementDetail setDetailId(Long detailId) {
+        this.detailId = detailId;
         return this;
     }
 
@@ -188,5 +190,17 @@ public class BankStatementDetail extends BaseEntity<BankStatement> {
         this.balance = balance;
         return this;
     }
-    
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BankStatementDetail)) return false;
+        BankStatementDetail that = (BankStatementDetail) o;
+        return Objects.equals(id, that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

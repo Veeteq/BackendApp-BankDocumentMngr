@@ -55,10 +55,10 @@ public class UtilityRepositoryDefault implements UtilityRepository {
         long nextLong = 0;
         long count = 0;
 
-        TypedQuery<Long> query = entityManager.createQuery("SELECT Count(bd) FROM BankStatementDetail bd WHERE bd.id = :id", Long.class);
+        TypedQuery<Long> query = entityManager.createQuery("SELECT Count(bd) FROM BankStatementDetail bd WHERE bd.detailId = :detailId", Long.class);
         do {
             nextLong = rnd.nextInt(bound);
-            count = query.setParameter("id", nextLong).getSingleResult();
+            count = query.setParameter("detailId", nextLong).getSingleResult();
         } while(count > 0);
 
         return nextLong;
