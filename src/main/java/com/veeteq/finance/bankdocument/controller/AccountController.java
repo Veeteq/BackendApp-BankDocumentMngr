@@ -30,7 +30,7 @@ public class AccountController {
 
 
     @GetMapping(path = {"", "/"})
-    public ResponseEntity<List<AccountDTO>> getAccountsForDocument() {
+    public ResponseEntity<List<AccountDTO>> getAccounts() {
         LOG.info("Retrieving accounts eligible for bank statement");
 
         List<AccountDTO> accounts = accountService.getAll();
