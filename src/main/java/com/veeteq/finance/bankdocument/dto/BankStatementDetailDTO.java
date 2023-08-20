@@ -10,8 +10,9 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
 public class BankStatementDetailDTO {
 
-    private Long id;
+    private Long bankStatementId;
     private Integer sequenceNumber;
+    private Long detailId;
     private String operationType;
 
     @JsonSerialize(using = LocalDateSerializer.class)
@@ -32,12 +33,12 @@ public class BankStatementDetailDTO {
     private BigDecimal amount;
     private BigDecimal balance;
 
-    public Long getId() {
-        return id;
+    public Long getBankStatementId() {
+        return bankStatementId;
     }
 
-    public BankStatementDetailDTO setId(Long id) {
-        this.id = id;
+    public BankStatementDetailDTO setBankStatementId(Long bankStatementId) {
+        this.bankStatementId = bankStatementId;
         return this;
     }
 
@@ -47,6 +48,15 @@ public class BankStatementDetailDTO {
 
     public BankStatementDetailDTO setSequenceNumber(Integer sequenceNumber) {
         this.sequenceNumber = sequenceNumber;
+        return this;
+    }
+
+    public Long getDetailId() {
+        return detailId;
+    }
+
+    public BankStatementDetailDTO setDetailId(Long detailId) {
+        this.detailId = detailId;
         return this;
     }
 

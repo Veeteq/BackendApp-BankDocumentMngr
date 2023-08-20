@@ -7,6 +7,7 @@ import com.veeteq.finance.bankdocument.dto.*;
 import com.veeteq.finance.bankdocument.dto.BankStatementInfoDTO;
 import com.veeteq.finance.bankdocument.model.BankStatement;
 import com.veeteq.finance.bankdocument.model.BankStatementDetail;
+import com.veeteq.finance.bankdocument.model.BankStatementDetailId;
 import com.veeteq.finance.bankdocument.model.FileType;
 import com.veeteq.finance.bankdocument.model.OperationType;
 import com.veeteq.finance.bankdocument.repository.UtilityRepository;
@@ -62,13 +63,40 @@ public class BankStatementMapper {
         dto.getDetails().stream()
         .map(this::toEntity)
         .forEach(detail -> {
-            detail.setId(detail.getId() == null ? detailIds[idx.getAndIncrement()] : detail.getId());
+            detail.setDetailId(detail.getDetailId() == null ? detailIds[idx.getAndIncrement()] : detail.getDetailId());
             entity.addToDetails(detail);
         });
 
         return entity;
     }
-    
+
+    public BankStatement updateWithDto(BankStatement entity, BankStatementDTO dto) {
+        entity.setReportDate(dto.getStatementDate())
+                .setOpeningAmount(dto.getOpeningBalance())
+                .setClosingAmount(dto.getClosingBalance())
+                .setFileName(dto.getFileName())
+                .setFileType(FileType.findByCode(dto.getContentType()));
+
+        Long[] detailIds = utilityRepository.getBankStatementDetailId(dto.getDetails().size());
+        AtomicInteger idx = new AtomicInteger(0);
+
+        dto.getDetails().stream()
+                .map(this::toEntity)
+                .forEach(detail -> {
+                    int index = entity.getDetails().indexOf(detail);
+                    if (index < 0) {
+                        detail.setDetailId(detail.getDetailId() == null ? detailIds[idx.getAndIncrement()] : detail.getDetailId());
+                        entity.addToDetails(detail);
+
+                    } else {
+                        entity.getDetails().get(index);
+                    }
+
+                });
+
+        return entity;
+    }
+
     public BankStatementSummaryDTO toSummaryDto(BankStatement entity) {
 
         AccountDTO account = accountService.getById(entity.getAccountId());
@@ -86,9 +114,12 @@ public class BankStatementMapper {
     }
 
     public BankStatementDetailDTO toDto(BankStatementDetail entity) {
+        BankStatementDetailId bankStatementDetailId = entity.getId();
+
         BankStatementDetailDTO dto = new BankStatementDetailDTO()
-                .setId(entity.getId())
-                .setSequenceNumber(entity.getSequenceNumber())
+                .setBankStatementId(bankStatementDetailId.getBankStatementId())
+                .setSequenceNumber(bankStatementDetailId.getSequenceNumber())
+                .setDetailId(entity.getDetailId())
                 .setOperationDate(entity.getOperationDate())
                 .setOperationType(entity.getOperationType().getCode())
                 .setPostingDate(entity.getPostingDate())
@@ -105,8 +136,8 @@ public class BankStatementMapper {
 
     private BankStatementDetail toEntity(BankStatementDetailDTO dto) {
         BankStatementDetail entity = new BankStatementDetail()
-        .setId(dto.getId())
-        .setSequenceNumber(dto.getSequenceNumber())
+        .setId(new BankStatementDetailId(dto.getBankStatementId(), dto.getSequenceNumber()))
+        .setDetailId(dto.getDetailId())
         .setOperationDate(dto.getOperationDate())
         .setOperationType(OperationType.valueOf(dto.getOperationType()))
         .setPostingDate(dto.getPostingDate())
@@ -127,7 +158,7 @@ public class BankStatementMapper {
       }
 
       BankDataDTO bankData = new BankDataDTO()
-                .setId(entity.getId())
+                .setId(entity.getDetailId())
                 .setIban(entity.getCounterpartyIban())
                 .setCounterparty(entity.getCounterpartyName())
                 .setCounterpartyAddress(entity.getCounterpartyAddress())
@@ -139,10 +170,10 @@ public class BankStatementMapper {
         if (entity == null) {
             return null;
         }
-
+        BankStatementDetailId bankStatementDetailId = entity.getId();
         BankStatementInfoDTO dto = new BankStatementInfoDTO()
-                .setId(entity.getId())
-                .setSequenceNumber(entity.getSequenceNumber())
+                .setDetailId(entity.getDetailId())
+                .setSequenceNumber(bankStatementDetailId.getSequenceNumber())
                 .setOperationType(entity.getOperationType().getCode())
                 .setOperationDate(entity.getOperationDate())
                 .setTitle(entity.getTitle())
@@ -151,4 +182,5 @@ public class BankStatementMapper {
                 .setAmount(entity.getAmount());
         return dto;
     }
+
 }
