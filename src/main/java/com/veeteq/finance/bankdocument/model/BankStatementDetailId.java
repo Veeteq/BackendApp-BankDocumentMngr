@@ -8,6 +8,8 @@ import java.util.Objects;
 @Embeddable
 public class BankStatementDetailId implements Serializable {
 
+  private static final long serialVersionUID = 1L;
+
   @Column(name = "stmt_id", nullable = false)
   private Long bankStatementId;
 
