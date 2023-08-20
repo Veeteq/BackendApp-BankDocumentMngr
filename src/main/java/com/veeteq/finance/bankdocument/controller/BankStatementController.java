@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -39,9 +40,10 @@ import com.veeteq.finance.bankdocument.service.BankStatementDetailService;
 import com.veeteq.finance.bankdocument.service.BankStatementService;
 
 @RestController
-@RequestMapping(path = "/api/bank/documents", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = BankStatementController.BASE_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin(origins = "*")
 public class BankStatementController {
+    public final static String BASE_URL = "/api/bank/documents";
     private final Logger LOG = LoggerFactory.getLogger(BankStatementController.class);
 
     private final BankStatementService bankStatementService;
@@ -143,6 +145,25 @@ public class BankStatementController {
       LOG.info(MessageFormat.format("file {0} parsed successfully, number of details: {1}", file.getOriginalFilename(), parsed.getDetails().size()));
 
       return ResponseEntity.ok().body(parsed);
+    }
+
+    @PutMapping(path = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<BankStatementDTO> update(@PathVariable(name = "id", required = true) Long id,
+                                                   @RequestPart(name = "document", required = true)  String json,
+                                                   @RequestPart(name = "file",     required = false) MultipartFile file) {
+        LOG.info("Processing put request and saving a new document");
+
+        BankStatementDTO bankStatement = null;
+        try {
+            bankStatement = mapper.readValue(json, BankStatementDTO.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException("Unable to read document");
+        }
+
+        BankStatementDTO updatedDocument = bankStatementService.updateDocument(id, bankStatement, file);
+
+        return ResponseEntity.ok(updatedDocument);
     }
 
     @DeleteMapping(path = "/{id}")
