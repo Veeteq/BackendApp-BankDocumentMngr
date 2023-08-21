@@ -39,9 +39,17 @@ import com.veeteq.finance.bankdocument.exception.ResourceNotFoundException;
 import com.veeteq.finance.bankdocument.service.BankStatementDetailService;
 import com.veeteq.finance.bankdocument.service.BankStatementService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping(path = BankStatementController.BASE_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin(origins = "*")
+@Tag(name = "BankStatementController", description = "API for Bank documents")
 public class BankStatementController {
     public final static String BASE_URL = "/api/bank/documents";
     private final Logger LOG = LoggerFactory.getLogger(BankStatementController.class);
@@ -58,6 +66,11 @@ public class BankStatementController {
         this.bankStatementDetailService = bankStatementDetailService;
     }
 
+    @Operation(summary = "Retrieve single BankStatement by its Id",
+               description = "Get single BankStatement object by specifying its id. The response is BankStatementDTO object with all the required details.")
+    @ApiResponses({@ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = BankStatementDTO.class), mediaType = "application/json") }),
+                   @ApiResponse(responseCode = "404", content = {@Content(schema = @Schema()) }),
+                   @ApiResponse(responseCode = "500", content = {@Content(schema = @Schema()) }) })
     @GetMapping(path = "/{id}")
     public ResponseEntity<BankStatementDTO> getById(@PathVariable("id") Long id) throws ResourceNotFoundException {
         LOG.info("Processing get request and retrieving single statment with id: " + id);
